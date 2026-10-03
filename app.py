@@ -182,7 +182,7 @@ def _plantilla(titulo, color, intro, filas, nota=""):
         for k, v in filas
     )
     return f"""
-    <div style="font-family:Segoe UI,Arial,sans-serif;max-width:620px;margin:auto;border:1px solid #e3e8ef;border-radius:8px;overflow:hidden">
+    <div style="font-family:Segoe UI,Arial,sans-serif;max-width:620px;margin:auto;border:1px solid #e3e8ef;border-radius:8px;overflow:hidden;background:#ffffff;color:#222222">
       <div style="background:{color};color:#fff;padding:14px 18px;font-size:18px;font-weight:600">{escape(titulo)}</div>
       <div style="padding:16px 18px;color:#222">
         <p style="margin-top:0">{intro}</p>
@@ -347,14 +347,15 @@ def revisar_umbrales(c, antes, despues):
 def seed(c):
     """Historial simulado jul–sep 2026 para que el tablero tenga contenido."""
     rnd = random.Random(42)
+    # Empresas y RUCs ficticios (no corresponden a clientes reales)
     empresas = [
-        ("20100047218", "ALICORP S.A.A."), ("20100128056", "SAGA FALABELLA S.A."),
-        ("20331061655", "CORPORACION ACEROS AREQUIPA S.A."), ("20100055237", "UNION DE CERVECERIAS BACKUS"),
-        ("20100190797", "GLORIA S.A."), ("20259829594", "SODIMAC PERU S.A."),
-        ("20512002090", "SUPERMERCADOS PERUANOS S.A."), ("20100030595", "FERREYROS S.A."),
-        ("20100152356", "SAN FERNANDO S.A."), ("20332093952", "TOYOTA DEL PERU S.A."),
-        ("20601234561", "AGROEXPORT NORTE S.A.C."), ("20545678912", "TEXTILES ANDINOS S.A.C."),
-        ("20487654321", "LOGISTICA DEL SUR S.A.C."), ("20398765432", "PESQUERA PACIFICO S.A."),
+        ("20999000011", "AGROINDUSTRIAL LOS ANDES S.A."), ("20999000029", "DISTRIBUIDORA PACIFICO NORTE S.A.C."),
+        ("20999000037", "METALURGICA SAN ISIDRO S.A."), ("20999000045", "BEBIDAS DEL VALLE S.A.A."),
+        ("20999000053", "LACTEOS LA CAMPIÑA S.A."), ("20999000061", "CONSTRUCTORA HORIZONTE S.A.C."),
+        ("20999000079", "RETAIL CENTRO LIMA S.A."), ("20999000087", "MAQUINARIAS DEL SUR S.A."),
+        ("20999000095", "AVICOLA SANTA ROSA S.A."), ("20999000109", "AUTOMOTRIZ CORDILLERA S.A."),
+        ("20999000117", "AGROEXPORT VILLA NORTE S.A.C."), ("20999000125", "TEXTIL ALPAQUERA DEL ALTIPLANO S.A.C."),
+        ("20999000133", "LOGISTICA COSTA AZUL S.A.C."), ("20999000141", "PESQUERA BAHIA ESMERALDA S.A."),
     ]
     inicio = datetime(2026, 7, 1, 9, 0)
     uso = 0
@@ -456,7 +457,7 @@ def pagina_nueva_solicitud():
 
     with st.form("solicitud", clear_on_submit=False):
         a, b = st.columns(2)
-        ejecutivo = a.selectbox("Ejecutivo comercial", [""] + EJECUTIVOS)
+        ejecutivo = a.selectbox("Ejecutivo comercial", EJECUTIVOS, index=None, placeholder="Seleccione el ejecutivo")
         banca = b.selectbox("Banca del cliente", BANCAS)
         ruc = a.text_input("RUC del cliente", max_chars=11, placeholder="20XXXXXXXXX")
         razon = b.text_input("Razón social")
@@ -721,8 +722,8 @@ def pagina_admin():
     if st.button("Llevar la bolsa al ~89% (para demostrar la alerta del 90%)"):
         objetivo = MONTO_BOLSA * 0.89 - uso
         if objetivo > 0:
-            procesar_solicitud(dict(ejecutivo="Ana Torres", banca="Corporativa", ruc="20100047218",
-                                    razon_social="ALICORP S.A.A.", producto="Factoring Electrónico",
+            procesar_solicitud(dict(ejecutivo="Ana Torres", banca="Corporativa", ruc="20999000011",
+                                    razon_social="AGROINDUSTRIAL LOS ANDES S.A.", producto="Factoring Electrónico",
                                     monto=round(objetivo, -3), plazo=240, tasa=6.5))
         st.rerun()
     if st.button("Reiniciar datos de ejemplo", type="secondary"):
@@ -736,6 +737,7 @@ def main():
     init_db()
     st.sidebar.title("💼 Bolsa de Fondeo Especial")
     st.sidebar.caption("Financiamiento de Ventas · USD 100 MM · no revolvente")
+    st.sidebar.caption("⚠️ Prototipo con datos simulados: clientes, RUCs, ejecutivos y operaciones son ficticios.")
     rol = st.sidebar.radio("Perfil", ["Ejecutivo Comercial", "Ejecutivo de Producto"])
     if rol == "Ejecutivo Comercial":
         paginas = {"Nueva solicitud": pagina_nueva_solicitud, "Consultar estado": pagina_consulta,
